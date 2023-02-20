@@ -9,12 +9,14 @@ namespace CheckoutBasket.UnitTests
     public class BasketControllerTests
     {
         private readonly Mock<IBasketManager> mockBasket;
+        private readonly Mock<IBasketPriceCalculator> mockPriceCalculator;
         private readonly BasketController testController;
 
         public BasketControllerTests()
         {
             mockBasket = new Mock<IBasketManager>();
-            testController = new BasketController(mockBasket.Object);
+            mockPriceCalculator = new Mock<IBasketPriceCalculator>();
+            testController = new BasketController(mockBasket.Object, mockPriceCalculator.Object);
         }
 
         [Fact]
@@ -53,6 +55,20 @@ namespace CheckoutBasket.UnitTests
 
             // Then
             Assert.Equivalent(contents, result);
+        }
+
+        public void BasketControllerCanCalculateBasketCost()
+        {
+            // Given
+            mockPriceCalculator
+                .Setup(c => c.GetCost(It.IsAny<IEnumerable<BasketItem>>()))
+                .Returns(50);
+
+            // When
+            var result = testController.GetCost();
+
+            // Then
+            Assert.Equal(50, result);
         }
     }
 }

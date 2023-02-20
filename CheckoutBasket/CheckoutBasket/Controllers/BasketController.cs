@@ -9,10 +9,12 @@ namespace CheckoutBasket.Controllers
     public class BasketController : ControllerBase
     {
         private readonly IBasketManager basket;
+        private readonly IBasketPriceCalculator pricing;
 
-        public BasketController(IBasketManager basketManager)
+        public BasketController(IBasketManager basketManager, IBasketPriceCalculator priceCalculator)
         {
             basket = basketManager;
+            pricing = priceCalculator;
         }
 
         [HttpGet]
@@ -24,7 +26,7 @@ namespace CheckoutBasket.Controllers
         [HttpGet("Cost", Name = "BasketCost")]
         public decimal GetCost()
         {
-            return 0;
+            return pricing.GetCost(basket.Contents());
         }
 
         [HttpPost(Name = "Add")]

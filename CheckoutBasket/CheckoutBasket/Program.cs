@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IBasketManager, BasketManager>();
+builder.Services.AddScoped<IBasketPriceCalculator, BasketPriceCalculator>();
 
 var app = builder.Build();
 
