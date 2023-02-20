@@ -1,5 +1,6 @@
 ﻿using CheckoutBasket.Basket;
 using CheckoutBasket.Models;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace CheckoutBasket.UnitTests
@@ -9,7 +10,8 @@ namespace CheckoutBasket.UnitTests
         private readonly BasketPriceCalculator testCalculator;
         public BasketPriceCalculatorTests()
         {
-            testCalculator = new BasketPriceCalculator();
+            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            testCalculator = new BasketPriceCalculator(config);
         }
 
         [Fact]
@@ -88,7 +90,7 @@ namespace CheckoutBasket.UnitTests
             // Given
             var basket = new[]
             {
-                new BasketItem(ItemType.B, quantity)
+                new BasketItem(ItemType.D, quantity)
             };
 
             // When
