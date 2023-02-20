@@ -65,8 +65,17 @@ namespace CheckoutBasket.UnitTests
         [Fact]
         public void BasketWithNoItemsCannotRemoveItem()
         {
-            // Given
             Assert.Throws<InvalidOperationException>(() => testController.Remove(ItemType.A, 1));
+        }
+
+        [Fact]
+        public void BasketCannotRemoveMoreItemsThanItHas()
+        {
+            // Given
+            testController.Add(ItemType.A, 1);
+
+            // Then
+            Assert.Throws<InvalidOperationException>(() => testController.Remove(ItemType.A, 2));
         }
     }
 }
