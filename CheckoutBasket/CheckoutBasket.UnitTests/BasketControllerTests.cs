@@ -1,81 +1,58 @@
+﻿using CheckoutBasket.Basket;
 using CheckoutBasket.Controllers;
 using CheckoutBasket.Models;
+using Moq;
 using Xunit;
 
 namespace CheckoutBasket.UnitTests
 {
     public class BasketControllerTests
     {
+        private readonly Mock<IBasketManager> mockBasket;
         private readonly BasketController testController;
 
         public BasketControllerTests()
         {
-            testController = new BasketController();
+            mockBasket = new Mock<IBasketManager>();
+            testController = new BasketController(mockBasket.Object);
         }
 
         [Fact]
-        public void BasketWithNoModificationsIsEmpty()
+        public void BasketControllerCanAddItems()
         {
             // When
-            var result = testController.Get();
+            testController.Add(ItemType.C, 5);
 
             // Then
-            Assert.Empty(result);
+            mockBasket.Verify(basket => basket.Add(ItemType.C, 5), Times.Once);
         }
 
         [Fact]
-        public void BasketWithAddedItemsIncludesThoseItems()
+        public void BasketControllerCanRemoveItems()
+        {
+            // When
+            testController.Remove(ItemType.C, 5);
+
+            // Then
+            mockBasket.Verify(basket => basket.Remove(ItemType.C, 5), Times.Once);
+        }
+
+        [Fact]
+        public void BasketControllerCanRetrieveContents()
         {
             // Given
-            testController.Add(ItemType.A, 2);
-            testController.Add(ItemType.B, 1);
-
-            // When
-            var result = testController.Get();
-
-            // Then
-            var expectedResult = new[]
+            var contents = new[]
             {
-                new BasketItem(ItemType.A, 2),
-                new BasketItem(ItemType.B, 1)
+                new BasketItem(ItemType.B, 3),
+                new BasketItem(ItemType.D, 2)
             };
-            Assert.Equivalent(expectedResult, result);
-        }
-
-        [Fact]
-        public void BasketWithRemovedItemsDoesNotIncludeThoseItems()
-        {
-            // Given
-            testController.Add(ItemType.A, 2);
-            testController.Add(ItemType.B, 1);
-            testController.Remove(ItemType.A, 1);
+            mockBasket.Setup(b => b.Contents()).Returns(contents);
 
             // When
             var result = testController.Get();
 
             // Then
-            var expectedResult = new[]
-            {
-                new BasketItem(ItemType.A, 1),
-                new BasketItem(ItemType.B, 1)
-            };
-            Assert.Equivalent(expectedResult, result);
-        }
-
-        [Fact]
-        public void BasketWithNoItemsCannotRemoveItem()
-        {
-            Assert.Throws<InvalidOperationException>(() => testController.Remove(ItemType.A, 1));
-        }
-
-        [Fact]
-        public void BasketCannotRemoveMoreItemsThanItHas()
-        {
-            // Given
-            testController.Add(ItemType.A, 1);
-
-            // Then
-            Assert.Throws<InvalidOperationException>(() => testController.Remove(ItemType.A, 2));
+            Assert.Equivalent(contents, result);
         }
     }
 }

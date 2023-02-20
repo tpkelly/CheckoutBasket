@@ -1,3 +1,4 @@
+using CheckoutBasket.Basket;
 using CheckoutBasket.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,17 +8,17 @@ namespace CheckoutBasket.Controllers
     [Route("[controller]")]
     public class BasketController : ControllerBase
     {
-        private readonly Dictionary<ItemType, int> items;
+        private readonly IBasketManager basket;
 
-        public BasketController()
+        public BasketController(IBasketManager basketManager)
         {
-            items = new Dictionary<ItemType, int>();
+            basket = basketManager;
         }
 
         [HttpGet]
         public IEnumerable<BasketItem> Get()
         {
-            return items.Select(item => new BasketItem(item.Key, item.Value));
+            return basket.Contents();
         }
 
         [HttpGet("Cost", Name = "BasketCost")]
@@ -29,31 +30,13 @@ namespace CheckoutBasket.Controllers
         [HttpPost(Name = "Add")]
         public void Add(ItemType item, int quantity = 1)
         {
-            if (items.ContainsKey(item))
-            {
-                items[item] += quantity;
-            }
-            else
-            {
-                items.Add(item, quantity);
-            }
+            basket.Add(item, quantity);
         }
-
 
         [HttpDelete(Name = "Remove")]
         public void Remove(ItemType item, int quantity = 1)
         {
-            if (!items.ContainsKey(item))
-            {
-                throw new InvalidOperationException($"Item {item} is not in the basket");
-            }
-
-            if (items[item] < quantity)
-            {
-                throw new InvalidOperationException($"Trying to remove more of item {item} than exist in the basket");
-            }
-
-            items[item] -= quantity;
+            basket.Remove(item, quantity);
         }   
     }
 }
