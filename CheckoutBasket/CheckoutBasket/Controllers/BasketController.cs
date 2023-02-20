@@ -24,13 +24,13 @@ namespace CheckoutBasket.Controllers
         }
 
         [HttpPost(Name = "Add")]
-        public void Add(BasketItem item, int quantity = 1)
+        public void Add(ItemType item, int quantity = 1)
         {
         }
 
 
         [HttpDelete(Name = "Remove")]
-        public void Remove(BasketItem item, int quantity = 1)
+        public void Remove(ItemType item, int quantity = 1)
         {
         }
     }
